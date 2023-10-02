@@ -11,13 +11,23 @@ import {
 import { useEffect } from "react";
 import Login from "./Authentication/Login";
 import SignUp from "./Authentication/SignUp";
+import { useNavigate } from "react-router-dom";
 
-//import Login from "../components/Authentication/Login";
-//import Signup from "../components/Authentication/Signup";
+
 
 function Homepage() {
   
+  const navigate=useNavigate();
+  
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  
 
+    if (userInfo) navigate("/chats");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
+
+   
   return (
     <Container maxW="xl" centerContent>
       <Box
