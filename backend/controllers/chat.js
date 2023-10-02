@@ -80,7 +80,7 @@ export const accessChat = async (req, res) => {
 };
 
   
-  
+  // add get all message
 export const getChats= async (req, res) => {
   try {
     const results = await Chat.findAll({
