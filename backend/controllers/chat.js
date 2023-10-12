@@ -9,12 +9,10 @@ const Message=db.messageInfo;
 export const accessChat = async (req, res) => {
   const { userId } = req.body;
 
-  console.log("Checking access chat..........");
-  console.log(`Current user ID: ${req.userId}`);
-  console.log(`Target user ID: ${userId}`);
+
 
   if (!userId) {
-    console.log("UserId param not sent with request");
+  
     return res.sendStatus(400);
   }
 
@@ -44,7 +42,7 @@ export const accessChat = async (req, res) => {
     });
 
     if (isChat) {
-      console.log('Chat already exists:', isChat);
+    
       return res.send(isChat);
     }
 
@@ -83,22 +81,26 @@ export const accessChat = async (req, res) => {
   // add get all message
 export const getChats= async (req, res) => {
   try {
+   // const userId = req.userId; // Assuming 'req.user.id' contains the user's ID
+
+    // Find all chats where the user is involved
+
+  
     const results = await Chat.findAll({
-
-     
-
+       
       include: [
         {
           model: User,
           as: 'users',
-        
-         
           attributes: { exclude: ['password'] },
+            where:{
+              id:req.userId
+             },
+          
         },
         {
           model: User,
           as: 'groupAdmin',
-     
           attributes: { exclude: ['password'] },
         },
         {
@@ -108,19 +110,55 @@ export const getChats= async (req, res) => {
             {
               model: User,
               as: 'sender',
-           
               attributes: ['name', 'pic', 'email'],
             },
           ],
         },
       ],
+      order: [['updatedAt', 'DESC']], // Order by 'updatedAt' in descending order
+    });
+
+    let chatIds = results.map((chat) => chat.id);
+ 
+
+    const data = await Chat.findAll({
 
     
-      order: [['updatedAt', 'DESC']],
+        where: {
+          id: chatIds, // Filter by the specific chatIds
+        },
+    
+     
+      include: [
+        {
+          model: User,
+          as: 'users',
+          attributes: { exclude: ['password'] },
+        },
+        {
+          model: User,
+          as: 'groupAdmin',
+          attributes: { exclude: ['password'] },
+        },
+        {
+          model: Message,
+          as: 'latestMessage',
+          include: [
+            {
+              model: User,
+              as: 'sender',
+              attributes: ['name', 'pic', 'email'],
+            },
+          ],
+        },
+      ],
+      order: [['updatedAt', 'DESC']], // Order by 'updatedAt' in descending order
     });
 
 
-    res.status(200).send(results);
+
+   res.status(200).send(data);
+
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: 'Bad Request' });
@@ -135,7 +173,7 @@ export const createGroupChat = async (req, res) => {
     }
   
 
-    console.log(req.userId)
+ 
     const users = JSON.parse(req.body.users);
   
     if (users.length < 2) {
@@ -233,12 +271,12 @@ export const createGroupChat = async (req, res) => {
       }
   
       // Check if the requester is an admin
-      //const isRequesterAdmin = req.useId === chat.groupAdminId;
+      const isRequesterAdmin = req.useId === chat.groupAdminId;
   
-    //  if (!isRequesterAdmin) {
-     //   res.status(403); // Forbidden
-     //   throw new Error("You are not authorized to remove users from this chat.");
-     // }
+     if (!isRequesterAdmin) {
+       res.status(403); // Forbidden
+       throw new Error("You are not authorized to remove users from this chat.");
+      }
   
       // Remove the user from the chat
       await chat.removeUser(userId);

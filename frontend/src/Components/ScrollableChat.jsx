@@ -12,10 +12,9 @@ const ScrollableChat = ({messages}) => {
 
  
 
- 
-    <ScrollableFeed>
 
-{messages &&
+    <ScrollableFeed>
+      {messages &&
         messages.map((m, i) => (
           <div style={{ display: "flex" }} key={m._id}>
             {(isSameSender(messages, m, i, user.id) ||
@@ -32,7 +31,7 @@ const ScrollableChat = ({messages}) => {
               </Tooltip>
             )}
 
-             <span
+            <span
               style={{
                 backgroundColor: `${
                   m.senderId === user.id ? "#BEE3F8" : "#B9F5D0"
@@ -46,11 +45,10 @@ const ScrollableChat = ({messages}) => {
             >
               {m.content}
             </span>
-               
-            </div>
+          </div>
         ))}
-
     </ScrollableFeed>
+
   
   )
 }

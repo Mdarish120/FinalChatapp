@@ -71,28 +71,25 @@ export const login= async(req,res)=>{
  
 export const allUsers = async (req, res) => {
     const { search } = req.query;
-
-   
-
     try {
       // Construct the WHERE clause for searching by name or email
-const whereClause = search
-? {
-    [db.Sequelize.Op.or]: [
-      db.Sequelize.where(
-        db.Sequelize.fn('LOWER', db.Sequelize.col('name')),
-        'LIKE',
-        `%${search.toLowerCase()}%`
-      ),
-      db.Sequelize.where(
-        db.Sequelize.fn('LOWER', db.Sequelize.col('email')),
-        'LIKE',
-        `%${search.toLowerCase()}%`
-      ),
-    ],
-    id: { [db.Sequelize.Op.ne]: req.userId }, // Exclude the current user
-  }
-: { id: { [db.Sequelize.Op.ne]: req.userId} };
+      const whereClause = search
+      ? {
+          [db.Sequelize.Op.or]: [
+            db.Sequelize.where(
+              db.Sequelize.fn('LOWER', db.Sequelize.col('name')),
+              'LIKE',
+              `%${search.toLowerCase()}%`
+            ),
+            db.Sequelize.where(
+              db.Sequelize.fn('LOWER', db.Sequelize.col('email')),
+              'LIKE',
+              `%${search.toLowerCase()}%`
+            ),
+          ],
+          id: { [db.Sequelize.Op.ne]: req.userId }, // Exclude the current user
+        }
+      : { id: { [db.Sequelize.Op.ne]: req.userId} };
       // Fetch users based on the where clause
       const users = await User.findAll({
         where: whereClause,

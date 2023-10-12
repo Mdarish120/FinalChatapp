@@ -1,4 +1,4 @@
-export const DB = 'chatgroupapp';
+export const DB = 'grpchatapp';
 export const PASSWORD = 'Arish123@';
 export const USER="root";
 export const HOST = 'localhost';
